@@ -183,23 +183,21 @@ class MyPacman(gym.Env):
     delta = 100.0
     epsilon = 1e-20
     states = self.getStates()
-
     goalStates = self.getGoalStates()
-
+    reward_matrix = self.getRewardMatrix()
     utility_matrix_o = np.zeros(self.map.shape)
     utility_matrix_n = np.zeros(self.map.shape)
-
-    reward_matrix = self.getRewardMatrix()
+    actions = [0, 1, 2, 3, 4]
     t = 0
     while delta > epsilon*(1 - gamma)/gamma:
       delta = 0.0
       utility_matrix_o = np.copy(utility_matrix_n)
+      state_action = []
       for s in states:
-        util_vec = [self.getUtilityOnMatrix(utility_matrix_o, self.transition([1], s)),
-                    self.getUtilityOnMatrix(utility_matrix_o, self.transition([2], s)),
-                    self.getUtilityOnMatrix(utility_matrix_o, self.transition([3], s)),
-                    self.getUtilityOnMatrix(utility_matrix_o, self.transition([4], s))]
+        util_vec = []
+        [util_vec.append(self.getUtilityOnMatrix(utility_matrix_o, self.transition([a], s))) for a in actions]
         utility_matrix_n[s[0],s[1]] = reward_matrix[s[0],s[1]] +  gamma*max(util_vec)
+        state_action.append([s, [np.argmax(util_vec)]])
         if s in goalStates:
           utility_matrix_n[s[0],s[1]] = reward_matrix[s[0],s[1]]
         delta = max(delta, abs(utility_matrix_n[s[0],s[1]] - utility_matrix_o[s[0],s[1]]))
@@ -207,7 +205,10 @@ class MyPacman(gym.Env):
       if delta < epsilon*(1 - gamma)/gamma:
         print('Converged after {} iterations'.format(t))
 
+    print('Utility map')
     print(utility_matrix_n.round(1))
+    print('State-action sequence')
+    print(state_action)
     fig, ax = plt.subplots()
     im = ax.imshow(utility_matrix_n)
     plt.title('Value iteration MAP')
