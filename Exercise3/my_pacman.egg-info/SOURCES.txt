@@ -1,0 +1,5 @@
+my_pacman.egg-info/PKG-INFO
+my_pacman.egg-info/SOURCES.txt
+my_pacman.egg-info/dependency_links.txt
+my_pacman.egg-info/requires.txt
+my_pacman.egg-info/top_level.txt
